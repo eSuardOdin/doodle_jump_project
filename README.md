@@ -1,6 +1,7 @@
 # doodle_jump_project
 School project
 
+Use web server to launch to prevent CORS error `php -S localhost:8000`
 
 ## To do
 - Draw basic map
