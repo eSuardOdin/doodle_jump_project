@@ -38,10 +38,10 @@ Will contain data about game objects or assets
 **Ideas about data contained**
 ``` javascript
 /** Informations about tiles we're going to use in view
- * @id : The id of tile, used to retrieve it
- * @x/y : leftmost/topmost postion of the tile
- * @w/h : width/height of the tile
- * /
+ * id : The id of tile, used to retrieve it
+ * x/y : leftmost/topmost postion of the tile
+ * w/h : width/height of the tile
+ */
 tiles [
     {id: 'player', x: 70, y: 15, w: 20, h: 70},
     {id: 'base_block', x: 1, y: 1, w: 50, h: 10},
