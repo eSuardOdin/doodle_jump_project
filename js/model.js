@@ -9,17 +9,19 @@ export default class Model {
         console.log('Model constructed');
         /** Position of tiles on the tilemap */
         this.tiles = [
-            {id: 'basic_tile', x: 1, y: 1, w: 57, h: 15},
-            {id: 'moving_tile', x: 1, y: 19, w: 57, h: 15},
+            {id: 'basic_tile',   x: 1, y: 1, w: 57, h: 15},
+            {id: 'moving_tile',  x: 1, y: 19, w: 57, h: 15},
             {id: 'falling_tile', x: 1, y: 55, w: 57, h: 15},
+            {id: 'bg',           x: 662, y: 333, w: 46, h: 64}
         ]
 
-        /** Just to test MVC for now */
-        this.grid = [
-            [0, 1, 0],
-            [2, 2, 0],
-            [1, 0, 1]
-        ];
+        /** Just to test for now */
+        this.map_array = [
+            {type: 'basic_tile', x: 50, y: 12},
+            {type: 'basic_tile', x: 30, y: 75},
+            {type: 'falling_tile', x: 10, y: 200},
+            {type: 'moving_tile', x: 100, y: 40},
+        ]
     }
 
     /**

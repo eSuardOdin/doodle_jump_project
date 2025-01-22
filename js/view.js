@@ -52,8 +52,8 @@ export default class View {
 
         this.canvas = this.createElement('canvas');
         this.canvas.id = 'play_screen';
-        this.canvas.width = 1080;
-        this.canvas.height = 720;
+        this.canvas.width = 352;
+        this.canvas.height = 530;
         this.canvas.border = "solid black 2px";
         this.root.append(this.canvas);
         this.ctx = this.canvas.getContext("2d");

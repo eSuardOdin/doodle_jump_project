@@ -40,7 +40,35 @@ Promise.all([
     app.sayHello();
     //app.view.testCanvas();
     console.log(app.model.getTile('basic_tile'));
-    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('basic_tile'), 10, 20);
-    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('moving_tile'), 120, 120);
-    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('falling_tile'), 45, 99);
+    
+    
+    // ES : test basic canvas layout
+    // Background
+    for (let x = 1; x < 352; x += 46) {
+        for (let y = 1; y < 530; y += 64) {
+            app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), x, y);
+        }
+    }
+    // Map elements
+    app.model.map_array.forEach(e => {
+        const tile = app.model.getTile(e.type);
+        app.view.displayTile(
+            HEXTILES_IMAGE,
+            tile,
+            e.x,
+            e.y
+        );
+    });
+
+
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 1, 1);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 58, 16);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 10, 20);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 10, 20);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 10, 20);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('bg'), 10, 20);
+
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('basic_tile'), 10, 20);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('moving_tile'), 120, 120);
+    // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('falling_tile'), 45, 99);
 });
