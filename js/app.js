@@ -38,5 +38,9 @@ Promise.all([
     console.log('Tilemap loaded');
     const app = new Controller(new View(), new Model());
     app.sayHello();
-    app.view.testCanvas();
+    //app.view.testCanvas();
+    console.log(app.model.getTile('basic_tile'));
+    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('basic_tile'), 10, 20);
+    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('moving_tile'), 120, 120);
+    app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('falling_tile'), 45, 99);
 });
