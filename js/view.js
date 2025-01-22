@@ -2,23 +2,9 @@ export default class View {
     
     constructor()
     {
-        console.log('View constructed');
-        this.root = this.getElement("#root");
-
-        // <canvas id="play_screen" width="198" height="120"></canvas>
-
-        this.canvas = this.createElement('canvas');
-        this.canvas.id = 'play_screen';
-        this.canvas.width = 300;
-        this.canvas.height = 512;
-        this.canvas.border = "solid black 2px";
-        this.root.append(this.canvas);
-        this.ctx = this.canvas.getContext("2d");
-        console.log(this.canvas);
-        // console.log(this.ctx);
-
-
+        this.screenInit();
     }
+
 
     // ES : Create an html element with optionnal CSS class
     createElement(tag, className) {
@@ -43,5 +29,19 @@ export default class View {
 
     displayTile(t) {
 
+    }
+
+
+    screenInit() {
+        console.log('View constructed');
+        this.root = this.getElement("#root");
+
+        this.canvas = this.createElement('canvas');
+        this.canvas.id = 'play_screen';
+        this.canvas.width = 300;
+        this.canvas.height = 512;
+        this.canvas.border = "solid black 2px";
+        this.root.append(this.canvas);
+        this.ctx = this.canvas.getContext("2d");
     }
 }
