@@ -71,4 +71,13 @@ Promise.all([
     // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('basic_tile'), 10, 20);
     // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('moving_tile'), 120, 120);
     // app.view.displayTile(HEXTILES_IMAGE, app.model.getTile('falling_tile'), 45, 99);
+
+
+
+    /* if (this._hit.x2 >= o.x  &&
+                            this._hit.x1 < o.x + 25 &&
+                            this._hit.y2 <= o.y -20 &&
+                            this._hit.y2 >= o.y + 20){
+                                this._Jump()
+                            }*/
 });

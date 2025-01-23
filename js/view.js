@@ -5,6 +5,10 @@ export default class View {
         this.screenInit();
     }
 
+    // ES : Input event
+    // bindInputEvent() {
+    //     document.
+    // }
 
     // ES : Create an html element with optionnal CSS class
     createElement(tag, className) {

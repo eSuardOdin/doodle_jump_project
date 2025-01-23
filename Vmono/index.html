@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouvement</title>
+</head>
+<body>
+    <canvas id="my_canvas" width="400" height="800" style="background: url('./assets/bck.png')" style="border: 1px solid red"></canvas>
+
+    <script>
+        class Model {
+            static GRAVITY     = 20;
+            static JUMP_FORCE  = 1000;
+            static SPEED       = 200;
+            static HEIGHT_TRIG = 250;
+
+            constructor() {
+                this._direction = 0;                
+                this._gravitySpeed = 0;
+                this._position = {x: 170, y:493};
+                this._map_objects = [
+                    {type: 'basic_tile', x: 50, y: -9800},
+                    {type: 'basic_tile', x: 75, y: -9600},
+                    {type: 'basic_tile', x: 120, y: -9300},
+                    {type: 'basic_tile', x: 95, y: -9100},
+                    {type: 'falling_tile', x: 200, y: -8900},
+                    {type: 'moving_tile', x: 150, y: -8700},
+                    {type: 'basic_tile', x: 30, y: -8500},
+                    {type: 'falling_tile', x: 300, y: -8200},
+                    {type: 'basic_tile', x: 120, y: -8000},
+                    {type: 'basic_tile', x: 50, y: -7800},
+                    {type: 'moving_tile', x: 100, y: -7600},
+                    {type: 'falling_tile', x: 250, y: -7400},
+                    {type: 'basic_tile', x: 30, y: -7200},
+                    {type: 'basic_tile', x: 75, y: -7000},
+                    {type: 'falling_tile', x: 278, y: -6800},
+                    {type: 'moving_tile', x: 100, y: -6600},
+                    {type: 'basic_tile', x: 50, y: -6400},
+                    {type: 'basic_tile', x: 95, y: -6200},
+                    {type: 'falling_tile', x: 278, y: -6000},
+                    {type: 'moving_tile', x: 120, y: -5800},
+                    {type: 'basic_tile', x: 30, y: -5600},
+                    {type: 'falling_tile', x: 300, y: -5400},
+                    {type: 'basic_tile', x: 120, y: -5200},
+                    {type: 'moving_tile', x: 200, y: -5000},
+                    {type: 'basic_tile', x: 75, y: -4800},
+                    {type: 'falling_tile', x: 278, y: -4600},
+                    {type: 'moving_tile', x: 100, y: -4400},
+                    {type: 'basic_tile', x: 50, y: -4200},
+                    {type: 'falling_tile', x: 250, y: -4000},
+                    {type: 'basic_tile', x: 30, y: -3800},
+                    {type: 'moving_tile', x: 150, y: -3600},
+                    {type: 'basic_tile', x: 95, y: -3400},
+                    {type: 'falling_tile', x: 278, y: -3200},
+                    {type: 'basic_tile', x: 120, y: -3000},
+                    {type: 'basic_tile', x: 75, y: -2800},
+                    {type: 'moving_tile', x: 100, y: -2600},
+                    {type: 'basic_tile', x: 50, y: -2400},
+                    {type: 'falling_tile', x: 200, y: -2200},
+                    {type: 'basic_tile', x: 95, y: -2000},
+                    {type: 'falling_tile', x: 278, y: -1800},
+                    {type: 'moving_tile', x: 120, y: -1600},
+                    {type: 'basic_tile', x: 30, y: -1400},
+                    {type: 'falling_tile', x: 300, y: -1200},
+                    {type: 'basic_tile', x: 75, y: -1000},
+                    {type: 'basic_tile', x: 50, y: -800},
+                    {type: 'moving_tile', x: 200, y: -600},
+                    {type: 'falling_tile', x: 278, y: -400},
+                    {type: 'basic_tile', x: 120, y: -200},
+                    {type: 'moving_tile', x: 100, y: 0},
+                    {type: 'basic_tile', x: 30, y: 200},
+                    {type: 'falling_tile', x: 250, y: 400},
+                    {type: 'basic_tile', x: 75, y: 600}
+                ];
+            }
+
+            get position() { return this._position; }
+
+            get direction() { return this._direction; }
+            set direction(value) { return this._direction = value; }
+            
+            GetMap() {
+                return this._map_objects;
+            }
+
+            BindDisplay(callback) {
+                this.b_Display = callback;
+            }
+
+           
+            Move(fps) {
+                // ES : Apply gravity to player
+                this._gravitySpeed += Model.GRAVITY;
+
+                // ES : If going up without go over height trigger, make map go down.
+                //  else, player goes up/down depending on gravitySpeed.
+                if(this.position.y < Model.HEIGHT_TRIG && this._gravitySpeed < 0) {
+                    this._map_objects.forEach(o => {
+                        o.y -= this._gravitySpeed / fps;
+                    })
+                } else {
+                    this._position.y += this._gravitySpeed / fps;
+                }
+
+                // ES : Apply horizontal motion
+                this._position.x += (this._direction * Model.SPEED / fps);
+                if(this._position.x > 370){
+                    this._position.x = -60;
+                } else if (this._position.x < -65){
+                    this._position.x = 365;
+                }
+
+                // ES : If falling down, check for platform collision
+                //  maybe improved by checking only viewable objects?
+                if(this._gravitySpeed > 0) {
+                    this._map_objects.forEach(o => {
+                        if((this._position.y <= o.y +20 && this._position.y >= o.y-40) && (this._position.x >= o.x - 20 && this._position.x <= o.x + 60)) {
+                            this._Jump()
+                        }
+                    })
+                    // ES : Game over condition to handle later
+                    if (this._position.y > 765) { 
+                        this._Jump();
+                    }
+                }
+
+                this.b_Display(this._position);
+            }
+
+            _Jump() {
+                this._gravitySpeed = -Model.JUMP_FORCE;
+            }
+        }
+
+
+
+
+
+        class View {
+            constructor() {
+                this._canvas = document.getElementById('my_canvas');
+                this.ctx     = this._canvas.getContext('2d');
+                this._hold_right = false;
+                this._hold_left = false;
+                // Tiles
+                this.t_player_r = {id: 'player',   x: 32, y: 30, w: 92, h: 90};
+                this.t_player_l = {id: 'player',   x: 0, y: 29, w: 92, h: 90};
+                this.tiles = [
+                    {id: 'basic_tile',   x: 1, y: 1, w: 57, h: 15},
+                    {id: 'moving_tile',  x: 1, y: 19, w: 57, h: 15},
+                    {id: 'falling_tile', x: 1, y: 55, w: 57, h: 15},
+                ]
+                this.Events();
+            }
+
+            GetTile(id) {
+                return this.tiles.find(t => t.id == id);
+            }
+
+            BindGetMap(callback) {
+                this.b_Map = callback;
+            }
+
+            BindSetDirection(callback) {
+                this.b_SetDirection = callback;
+            }
+
+            Events() {
+                document.addEventListener('keydown', (evt) => {                
+                    if (evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') {
+                        switch (evt.key) {
+                            case 'ArrowLeft': // Move left.
+                                this._hold_left = true;
+                                this.b_SetDirection(-1);
+                                break;
+                            case 'ArrowRight': // Move right.
+                                this._hold_right = true;
+                                this.b_SetDirection(1);
+                                break;
+                        }
+                    }
+                });
+
+                document.addEventListener('keyup', (evt) => {
+                    switch (evt.key) {
+                        case 'ArrowLeft': // Move left.
+                            if (!this._hold_right) {
+                                this.b_SetDirection(0);
+                            }
+                            this._hold_left = false;
+                            break;
+                        case 'ArrowRight': // Move right.
+                            if (!this._hold_left) {
+                                this.b_SetDirection(0);
+                            }
+                            this._hold_right = false;
+                            break;
+                    }
+                });
+            }
+
+            Display(position) {
+                let x = position.x;
+                let y = position.y;
+                
+                this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                this.b_Map().forEach(obj => {
+                    const tile = this.GetTile(obj.type);
+                    this.ctx.drawImage(HEXTILES_IMAGE, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
+                });
+                if(this._hold_left) {
+                    this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                    this.ctx.drawImage(DOODLE_L, this.t_player_l.x, this.t_player_l.y, this.t_player_l.w, this.t_player_l.h, x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                }
+                else{
+                    this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                    this.ctx.drawImage(DOODLE_R, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
+                }
+            }
+
+
+
+        }
+
+
+
+
+
+        class Controller {
+            constructor(model, view) {
+                this._model = model;
+                this._view = view;
+                
+                this._startTime     = Date.now();
+                this._lag           = 0;
+                this._fps           = 60; // Frame rate.
+                this._frameDuration = 1000 / this._fps; // Avec 60 frame par seconde, la frame va durer 16.7ms.
+
+                this._model.BindDisplay(this.Display.bind(this));
+                this._view.BindSetDirection(this.SetDirection.bind(this));
+                this._view.BindGetMap(this.GetMap.bind(this));
+            }
+
+
+            GetMap() {
+                return this._model.GetMap();
+            }
+
+            Display(position) {
+                this._view.Display(position);
+            }
+
+            SetDirection(newDirection) {
+                this._model.direction = newDirection;
+            }
+            
+            Update() {
+                /* Calcul du deltaTime */
+                let currentTime = Date.now();
+                let deltaTime   = currentTime - this._startTime; // La durée entre deux appels (entre 2 frames).
+                
+                this._lag += deltaTime;
+                this._startTime = currentTime;
+
+                /* Mettre à jour la logique si la variable _lag est supérieure ou égale à la durée d'une frame */
+                while (this._lag >= this._frameDuration) {
+                    /* Mise à jour de la logique */
+                    this._model.Move(this._fps);
+                    /* Réduire la variable _lag par la durée d'une frame */
+                    this._lag -= this._frameDuration;
+                }
+                
+                requestAnimationFrame(this.Update.bind(this)); // La fonction de rappel est généralement appelée 60 fois par seconde.
+            }
+        }
+
+        
+
+        const HEXTILES_IMAGE = new Image();
+        HEXTILES_IMAGE.src = './assets/game-tiles.png';
+        const DOODLE_R = new Image();
+        DOODLE_R.src = './assets/lik-right.png';
+        const DOODLE_L = new Image();
+        DOODLE_L.src = './assets/lik-left.png';
+        Promise.all([
+            new Promise( (resolve) => {HEXTILES_IMAGE.addEventListener('load', () => { resolve();}); })
+        ])
+        .then(() => {
+            const app = new Controller(new Model(), new View());
+            app.Update();
+        });
+    </script>
+    
+</body>
+</html>
