@@ -13,12 +13,14 @@
             static GRAVITY     = 20;
             static JUMP_FORCE  = 1000;
             static SPEED       = 200;
-            static HEIGHT_TRIG = 250;
-            static MAX_GAP = 350;
+            static HEIGHT_TRIG = 300;
+            static MAX_GAP = 370;
             constructor() {
+                this._score = 0;
                 this._direction = 0;                
                 this._gravitySpeed = 0;
                 this._position = {x: 170, y:493, last_pos: 'r'};
+                this._actual_gap = 40;
                 this._map_objects = [                   
                     {type: 'basic_tile', x: 75, y: 600, is_sentinel: true}
                 ];
@@ -40,6 +42,15 @@
 
            
             Move(fps) {
+                // ES : Incrementing gap between platforms
+                if(this._actual_gap < Model.MAX_GAP) {
+                    this._actual_gap += this._score/50000;
+                    if(this._actual_gap > Model.MAX_GAP) {
+                        this._actual_gap = Model.MAX_GAP;
+                    }
+                }
+
+
                 // ES : Apply gravity to player
                 this._gravitySpeed += Model.GRAVITY;
 
@@ -48,11 +59,24 @@
                 if(this.position.y < Model.HEIGHT_TRIG && this._gravitySpeed < 0) {
                     this._map_objects.forEach(o => {
                         o.y -= this._gravitySpeed / fps;
-                    })
+                        if(o.type === "moving_tile") {
+                            this._MovePlateform(o);
+                        } else if(o.type === "falling_tile" && o.is_falling === true) {
+                            this._DropPlatform(o);
+                        }
+                    });
+                    this._score = Math.floor(this._score - ((this._gravitySpeed / fps)/2));
                 } else {
                     this._position.y += this._gravitySpeed / fps;
+                    this._map_objects.forEach(o => {
+                        if(o.type === "moving_tile") {
+                            this._MovePlateform(o);
+                        } else if(o.type === "falling_tile" && o.is_falling === true) {
+                            this._DropPlatform(o);
+                        }
+                    })
                 }
-
+                
                 // ES : Apply horizontal motion
                 this._position.x += (this._direction * Model.SPEED / fps);
                 if(this._position.x > 370){
@@ -66,7 +90,8 @@
                 if(this._gravitySpeed > 0) {
                     this._map_objects.forEach(o => {
                         if((this._position.y <= o.y +20 && this._position.y >= o.y-40) && (this._position.x >= o.x - 20 && this._position.x <= o.x + 60)) {
-                            this._Jump()
+                            this._Jump();
+                            if(o.type === "falling_tile") o.is_falling = true;
                         }
                     })
                     // ES : Game over condition to handle later
@@ -78,8 +103,8 @@
                 this.b_Display(this._position);
                 this._map_objects = this._map_objects.filter(o => o.y < 800);
 
-                if(this._map_objects.length < 10) {
-
+                // if(this._map_objects.length < 10) {
+                while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
                     this._FillMap();
                 }
             }
@@ -89,25 +114,48 @@
             }
 
             _FillMap() {
-                const last_sentinel = this._map_objects.findLast(o => o.is_sentinel === true);
-                let new_sentinel = this._GeneratePlatform(last_sentinel);
-                // while(new_sentinel.y > -Model.MAX_GAP) {
+                // while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
+                    const last_sentinel = this._map_objects.findLast(o => o.is_sentinel === true);
+                    let new_sentinel = this._GeneratePlatform(last_sentinel);
                     this._map_objects.push(new_sentinel);
-                    console.log(last_sentinel);
-                    console.log(new_sentinel);
-                    console.log(this._map_objects);
                 // }
             }
 
             _GeneratePlatform(last_sentinel) {
                 const platform_x = Math.floor(Math.random() * 340); // Max = canvas width - platform width
                 // Math.random() * (max - min) + min;
-                const platform_y = Math.floor(Math.random() * ((last_sentinel.y - Model.MAX_GAP - 15) - (last_sentinel.y - Model.MAX_GAP + 15)) + (last_sentinel.y - Model.MAX_GAP + 15));
-                const new_platform = {type: "basic_tile", x: platform_x, y: platform_y, is_sentinel: true};
+                const platform_y = Math.floor(Math.random() * ((last_sentinel.y - this._actual_gap - 15) - (last_sentinel.y - this._actual_gap + 15)) + (last_sentinel.y - this._actual_gap + 15));
                 
-                console.log(new_platform);
-                return new_platform;
+                let x = Math.random() * 20;
+                console.log(`x: ${x} vs score: ${this._score / 1000}`);
+                // ES : Check if returning falling/moving or normal platform 
+                if(x < this._score / 500) {
+                    if(platform_x % 2 >= 1) {
+                        return {type: "falling_tile", x: platform_x, y: platform_y, is_sentinel: true, is_falling: false, speed: 7};    
+                    }
+                    let dir = x % 2 >= 1 ? 1 : -1;
+                    return {type: "moving_tile", x: platform_x, y: platform_y, is_sentinel: true, direction: dir, speed: 0.7};
+                } else {
+                    return {type: "basic_tile", x: platform_x, y: platform_y, is_sentinel: true};
+                }
+                
+                
+                // return new_platform;
             }
+
+            _MovePlateform(obj) {
+                if(obj.direction === 1 && obj.x > 340) {
+                    obj.direction = -1;
+                } else if(obj.direction === -1 && obj.x < 2) {
+                    obj.direction = 1;
+                }
+                obj.x += (obj.direction * obj.speed);
+            }
+
+            _DropPlatform(obj) {
+                obj.y += obj.speed;
+            }
+
         }
 
 

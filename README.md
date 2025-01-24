@@ -19,6 +19,11 @@ I think we have three main steps to process (like in many games)
 3) Render view
 *Update graphics*
 
+### Platform spawning
+*Two (or more) possible choices here* :
+1) Definition of an initial value representing the medium space between platforms -> Increments with score until it reaches a max gap
+2) Keep sentinel tiles and randomize the spawning of middle platforms between depending on score
+
 ### Game behavior
 - **Score**: Player must go upwards to gain points. 
 - **Gameplay**: The player is auto jumping a constant height 
