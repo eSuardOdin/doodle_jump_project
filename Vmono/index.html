@@ -14,69 +14,19 @@
             static JUMP_FORCE  = 1000;
             static SPEED       = 200;
             static HEIGHT_TRIG = 250;
-
+            static MAX_GAP = 350;
             constructor() {
                 this._direction = 0;                
                 this._gravitySpeed = 0;
-                this._position = {x: 170, y:493};
-                this._map_objects = [
-                    {type: 'basic_tile', x: 50, y: -9800},
-                    {type: 'basic_tile', x: 75, y: -9600},
-                    {type: 'basic_tile', x: 120, y: -9300},
-                    {type: 'basic_tile', x: 95, y: -9100},
-                    {type: 'falling_tile', x: 200, y: -8900},
-                    {type: 'moving_tile', x: 150, y: -8700},
-                    {type: 'basic_tile', x: 30, y: -8500},
-                    {type: 'falling_tile', x: 300, y: -8200},
-                    {type: 'basic_tile', x: 120, y: -8000},
-                    {type: 'basic_tile', x: 50, y: -7800},
-                    {type: 'moving_tile', x: 100, y: -7600},
-                    {type: 'falling_tile', x: 250, y: -7400},
-                    {type: 'basic_tile', x: 30, y: -7200},
-                    {type: 'basic_tile', x: 75, y: -7000},
-                    {type: 'falling_tile', x: 278, y: -6800},
-                    {type: 'moving_tile', x: 100, y: -6600},
-                    {type: 'basic_tile', x: 50, y: -6400},
-                    {type: 'basic_tile', x: 95, y: -6200},
-                    {type: 'falling_tile', x: 278, y: -6000},
-                    {type: 'moving_tile', x: 120, y: -5800},
-                    {type: 'basic_tile', x: 30, y: -5600},
-                    {type: 'falling_tile', x: 300, y: -5400},
-                    {type: 'basic_tile', x: 120, y: -5200},
-                    {type: 'moving_tile', x: 200, y: -5000},
-                    {type: 'basic_tile', x: 75, y: -4800},
-                    {type: 'falling_tile', x: 278, y: -4600},
-                    {type: 'moving_tile', x: 100, y: -4400},
-                    {type: 'basic_tile', x: 50, y: -4200},
-                    {type: 'falling_tile', x: 250, y: -4000},
-                    {type: 'basic_tile', x: 30, y: -3800},
-                    {type: 'moving_tile', x: 150, y: -3600},
-                    {type: 'basic_tile', x: 95, y: -3400},
-                    {type: 'falling_tile', x: 278, y: -3200},
-                    {type: 'basic_tile', x: 120, y: -3000},
-                    {type: 'basic_tile', x: 75, y: -2800},
-                    {type: 'moving_tile', x: 100, y: -2600},
-                    {type: 'basic_tile', x: 50, y: -2400},
-                    {type: 'falling_tile', x: 200, y: -2200},
-                    {type: 'basic_tile', x: 95, y: -2000},
-                    {type: 'falling_tile', x: 278, y: -1800},
-                    {type: 'moving_tile', x: 120, y: -1600},
-                    {type: 'basic_tile', x: 30, y: -1400},
-                    {type: 'falling_tile', x: 300, y: -1200},
-                    {type: 'basic_tile', x: 75, y: -1000},
-                    {type: 'basic_tile', x: 50, y: -800},
-                    {type: 'moving_tile', x: 200, y: -600},
-                    {type: 'falling_tile', x: 278, y: -400},
-                    {type: 'basic_tile', x: 120, y: -200},
-                    {type: 'moving_tile', x: 100, y: 0},
-                    {type: 'basic_tile', x: 30, y: 200},
-                    {type: 'falling_tile', x: 250, y: 400},
-                    {type: 'basic_tile', x: 75, y: 600}
+                this._position = {x: 170, y:493, last_pos: 'r'};
+                this._map_objects = [                   
+                    {type: 'basic_tile', x: 75, y: 600, is_sentinel: true}
                 ];
+                this._FillMap();
+
             }
 
             get position() { return this._position; }
-
             get direction() { return this._direction; }
             set direction(value) { return this._direction = value; }
             
@@ -126,10 +76,37 @@
                 }
 
                 this.b_Display(this._position);
+                this._map_objects = this._map_objects.filter(o => o.y < 800);
+
+                if(this._map_objects.length < 10) {
+
+                    this._FillMap();
+                }
             }
 
             _Jump() {
                 this._gravitySpeed = -Model.JUMP_FORCE;
+            }
+
+            _FillMap() {
+                const last_sentinel = this._map_objects.findLast(o => o.is_sentinel === true);
+                let new_sentinel = this._GeneratePlatform(last_sentinel);
+                // while(new_sentinel.y > -Model.MAX_GAP) {
+                    this._map_objects.push(new_sentinel);
+                    console.log(last_sentinel);
+                    console.log(new_sentinel);
+                    console.log(this._map_objects);
+                // }
+            }
+
+            _GeneratePlatform(last_sentinel) {
+                const platform_x = Math.floor(Math.random() * 340); // Max = canvas width - platform width
+                // Math.random() * (max - min) + min;
+                const platform_y = Math.floor(Math.random() * ((last_sentinel.y - Model.MAX_GAP - 15) - (last_sentinel.y - Model.MAX_GAP + 15)) + (last_sentinel.y - Model.MAX_GAP + 15));
+                const new_platform = {type: "basic_tile", x: platform_x, y: platform_y, is_sentinel: true};
+                
+                console.log(new_platform);
+                return new_platform;
             }
         }
 
@@ -203,13 +180,18 @@
             Display(position) {
                 let x = position.x;
                 let y = position.y;
-                
+                // let last_pos = position.last_pos;
+                if(this._hold_left) {
+                    position.last_pos = 'l';
+                } else if(this._hold_right) {
+                    position.last_pos = 'r';
+                }
                 this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
                 this.b_Map().forEach(obj => {
                     const tile = this.GetTile(obj.type);
                     this.ctx.drawImage(HEXTILES_IMAGE, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
                 });
-                if(this._hold_left) {
+                if(position.last_pos === 'l') {
                     this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
                     this.ctx.drawImage(DOODLE_L, this.t_player_l.x, this.t_player_l.y, this.t_player_l.w, this.t_player_l.h, x, y, this.t_player_l.w/2, this.t_player_l.h/2);
                 }
