@@ -16,13 +16,14 @@
             static HEIGHT_TRIG = 300;
             static MAX_GAP = 370;
             constructor() {
+                this._game_state = "MENU"
                 this._score = 0;
                 this._direction = 0;                
                 this._gravitySpeed = 0;
                 this._position = {x: 170, y:493, last_pos: 'r'};
                 this._actual_gap = 40;
                 this._map_objects = [                   
-                    {type: 'basic_tile', x: 75, y: 600, is_sentinel: true}
+                    {type: 'basic_tile', x: 15, y: 600, is_sentinel: true}
                 ];
                 this._FillMap();
 
@@ -34,6 +35,10 @@
             
             GetMap() {
                 return this._map_objects;
+            }
+
+            GetGameState() {
+                return this._game_state;
             }
 
             BindDisplay(callback) {
@@ -187,6 +192,10 @@
                 this.b_Map = callback;
             }
 
+            BindGetGameState(callback) {
+                this.b_GameState = callback;
+            }
+
             BindSetDirection(callback) {
                 this.b_SetDirection = callback;
             }
@@ -270,11 +279,17 @@
                 this._model.BindDisplay(this.Display.bind(this));
                 this._view.BindSetDirection(this.SetDirection.bind(this));
                 this._view.BindGetMap(this.GetMap.bind(this));
+                this._view.BindGetGameState(this.GetGameState.bind(this));
+
             }
 
 
             GetMap() {
                 return this._model.GetMap();
+            }
+
+            GetGameState() {
+                return this._model.GetGameState();
             }
 
             Display(position) {
