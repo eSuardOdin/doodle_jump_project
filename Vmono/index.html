@@ -19,8 +19,8 @@
             static GRAVITY     = 40;
             static JUMP_FORCE  = 1400;
             static SPEED       = 200;
-            static HEIGHT_TRIG = 300;
-            static MAX_GAP = 370;
+            static HEIGHT_TRIG = 315;   // ES : Height to trigger ascension 
+            static MAX_GAP = 370;       // ES : Max distance between platforms 
             constructor() {
                 this.InitGame('MENU');
             }
@@ -118,7 +118,6 @@
                     this._FillMap();
                 }
             }
-
 
             InitGame(state) {
                 this._game_state = state;
@@ -287,11 +286,9 @@
                         this.ctx.drawImage(HEXTILES_IMAGE, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
                     });
                     if(position.last_pos === 'l') {
-                        this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
                         this.ctx.drawImage(DOODLE_L, this.t_player_l.x, this.t_player_l.y, this.t_player_l.w, this.t_player_l.h, x, y, this.t_player_l.w/2, this.t_player_l.h/2);
                     }
                     else{
-                        this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
                         this.ctx.drawImage(DOODLE_R, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
                     }
                 }
