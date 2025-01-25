@@ -89,6 +89,7 @@ export default class View {
 
     Display(position) {
         if(this.b_GameState() === 'GAME') {
+            
 
             let x = position.x;
             let y = position.y;
@@ -98,7 +99,10 @@ export default class View {
             } else if(this._hold_right) {
                 position.last_pos = 'r';
             }
+            // ES : -- GOTCHA -- Clear last screen, if anything to print, put it after.
             this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+
+            
             this.b_Map().forEach(obj => {
                 const tile = this.GetTile(obj.type);
                 this.ctx.drawImage(this._hex_img, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
@@ -109,6 +113,10 @@ export default class View {
             else{
                 this.ctx.drawImage(this._r_img, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
             }
+            
+            // ES : print score
+            this.ctx.font = 'italic 18px DejaVu Sans Mono';
+            this.ctx.fillText(`Score: ${this.b_Score()}`, 5, 15);
         }
         else if(this.b_GameState() === 'MENU') {
             this.ctx.font = 'italic 50px DejaVu Sans Mono';

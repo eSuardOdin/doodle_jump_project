@@ -97,13 +97,17 @@ export default class Model {
         //  maybe improved by checking only viewable objects?
         if(this._gravitySpeed > 0) {
             this._map_objects.forEach(o => {
-                if((this._position.y+25 <= o.y  && this._position.y >= o.y-50) && (this._position.x >= o.x - 20 && this._position.x <= o.x + 60)) {
+                if((this._position.y+25 <= o.y  && this._position.y >= o.y-50) && (this._position.x >= o.x - 28 && this._position.x <= o.x + 45)) {
                     this._Jump();
                     if(o.type === "falling_tile") o.is_falling = true;
                 }
             })
-            // ES : Game over condition to handle later
+            // ES : If falling
             if (this._position.y > 830) { 
+                // ES : Comment this for real conditions
+                //this._Jump();
+                
+                // ES : Comment this to debug
                 this._game_state = 'OVER';
             }
         }
