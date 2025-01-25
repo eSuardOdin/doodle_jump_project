@@ -1,8 +1,3 @@
-/**
- * 0, plateforme normale: 1, 1, 57, 15
- * Will contain path to tilemap
- * Maybe an array of object representing tiles in tilemap (id, x, y, width, height)
- */
 export default class Model {
     static GRAVITY     = 40;
     static JUMP_FORCE  = 1400;
@@ -17,18 +12,34 @@ export default class Model {
     get direction() { return this._direction; }
     set direction(value) { return this._direction = value; }
     
+    /**
+     * Used by Controller to bind with View
+     * @returns Player's score
+     */
     GetScore() {
         return this._score;
     }
 
+    /**
+     * Used by Controller to bind with View
+     * @returns Location and type of objects present on map
+     */
     GetMap() {
         return this._map_objects;
     }
 
+    /**
+     * Used by Controller to bind with View
+     * @returns The game state { GAME | MENU | OVER }
+     */
     GetGameState() {
         return this._game_state;
     }
 
+    /**
+     * Used by Controller so View can set Game state on keyboard events
+     * @param {*} game_state The game state to set { GAME | MENU | OVER }
+     */
     SetGameState(game_state) {
         this._game_state = game_state;
     }
@@ -101,12 +112,16 @@ export default class Model {
         // ES : Get rid of bottom platforms
         this._map_objects = this._map_objects.filter(o => o.y < 800);
 
-        // if(this._map_objects.length < 10) {
         while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
             this._FillMap();
         }
     }
 
+    /**
+     * Init of the game, used in Model constructor with `InitGame('MENU')` and
+     * in View with `InitGame('GAME')` after a game over
+     * @param {*} state The state we want the game to (re)/init in.
+     */
     InitGame(state) {
         this._game_state = state;
         this._score = 0;
@@ -120,18 +135,30 @@ export default class Model {
         this._FillMap();
     }
 
+    /**
+     * Boing boing
+     */
     _Jump() {
         this._gravitySpeed = -Model.JUMP_FORCE;
     }
 
+    /**
+     * Push new platform after the last one
+     * @todo sentinel concept is deprecated, to refactor.
+     */
     _FillMap() {
-        // while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
             const last_sentinel = this._map_objects.findLast(o => o.is_sentinel === true);
             let new_sentinel = this._GeneratePlatform(last_sentinel);
             this._map_objects.push(new_sentinel);
-        // }
     }
 
+    /**
+     * Generate a new platform :
+     *      - Randomize X and Y of new platform
+     *      - Randomize type of plateform (more chance of special platforms spawning depending on score)
+     * @param {*} last_sentinel Deprecated, this is juste the plateform placed before the one we're creating 
+     * @returns An object representing platform
+     */
     _GeneratePlatform(last_sentinel) {
         const platform_x = Math.floor(Math.random() * 340); // Max = canvas width - platform width
         // Math.random() * (max - min) + min;
@@ -150,6 +177,10 @@ export default class Model {
         }
     }
 
+    /**
+     * Move moving platform
+     * @param {*} obj The platform to move
+     */
     _MovePlateform(obj) {
         if(obj.direction === 1 && obj.x > 340) {
             obj.direction = -1;
@@ -159,6 +190,10 @@ export default class Model {
         obj.x += (obj.direction * obj.speed);
     }
 
+    /**
+     * Drop falling platform
+     * @param {*} obj The platform to drop
+     */
     _DropPlatform(obj) {
         obj.y += obj.speed;
     }
