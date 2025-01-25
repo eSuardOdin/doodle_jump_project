@@ -23,6 +23,7 @@
                 this._position = {x: 170, y:493, last_pos: 'r'};
                 this._actual_gap = 40;
                 this._map_objects = [                   
+                    // {type: 'basic_tile', x: 160, y: 400, is_sentinel: true}
                     {type: 'basic_tile', x: 160, y: 750, is_sentinel: true}
                 ];
                 this._FillMap();
@@ -97,7 +98,7 @@
                 //  maybe improved by checking only viewable objects?
                 if(this._gravitySpeed > 0) {
                     this._map_objects.forEach(o => {
-                        if((this._position.y <= o.y +20 && this._position.y >= o.y-40) && (this._position.x >= o.x - 20 && this._position.x <= o.x + 60)) {
+                        if((this._position.y+25 <= o.y  && this._position.y >= o.y-50) && (this._position.x >= o.x - 20 && this._position.x <= o.x + 60)) {
                             this._Jump();
                             if(o.type === "falling_tile") o.is_falling = true;
                         }
@@ -109,6 +110,7 @@
                 }
 
                 this.b_Display(this._position);
+                // ES : Get rid of bottom platforms
                 this._map_objects = this._map_objects.filter(o => o.y < 800);
 
                 // if(this._map_objects.length < 10) {
