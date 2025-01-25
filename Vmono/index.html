@@ -10,8 +10,8 @@
 
     <script>
         class Model {
-            static GRAVITY     = 20;
-            static JUMP_FORCE  = 1000;
+            static GRAVITY     = 40;
+            static JUMP_FORCE  = 1400;
             static SPEED       = 200;
             static HEIGHT_TRIG = 300;
             static MAX_GAP = 370;
@@ -23,7 +23,7 @@
                 this._position = {x: 170, y:493, last_pos: 'r'};
                 this._actual_gap = 40;
                 this._map_objects = [                   
-                    {type: 'basic_tile', x: 15, y: 600, is_sentinel: true}
+                    {type: 'basic_tile', x: 160, y: 750, is_sentinel: true}
                 ];
                 this._FillMap();
 
@@ -41,6 +41,9 @@
                 return this._game_state;
             }
 
+            SetGameState(game_state) {
+                this._game_state = game_state;
+            }
             BindDisplay(callback) {
                 this.b_Display = callback;
             }
@@ -132,7 +135,7 @@
                 const platform_y = Math.floor(Math.random() * ((last_sentinel.y - this._actual_gap - 15) - (last_sentinel.y - this._actual_gap + 15)) + (last_sentinel.y - this._actual_gap + 15));
                 
                 let x = Math.random() * 20;
-                console.log(`x: ${x} vs score: ${this._score / 1000}`);
+                //console.log(`x: ${x} vs score: ${this._score / 1000}`);
                 // ES : Check if returning falling/moving or normal platform 
                 if(x < this._score / 500) {
                     if(platform_x % 2 >= 1) {
@@ -196,13 +199,18 @@
                 this.b_GameState = callback;
             }
 
+            BindSetGameState(callback) {
+                this.b_SetGameState = callback;
+            }
+
             BindSetDirection(callback) {
                 this.b_SetDirection = callback;
             }
 
             Events() {
-                document.addEventListener('keydown', (evt) => {                
-                    if (evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') {
+                document.addEventListener('keydown', (evt) => {
+                    console.log(evt.key);                
+                    if ((evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') && this.b_GameState() === 'GAME') {
                         switch (evt.key) {
                             case 'ArrowLeft': // Move left.
                                 this._hold_left = true;
@@ -213,28 +221,34 @@
                                 this.b_SetDirection(1);
                                 break;
                         }
+                    } else if(evt.key === ' ' && this.b_GameState() === 'MENU' || this.b_GameState() === 'OVER') {
+                        // console.log('pressed space');
+                        this.b_SetGameState('GAME');
                     }
                 });
 
                 document.addEventListener('keyup', (evt) => {
-                    switch (evt.key) {
-                        case 'ArrowLeft': // Move left.
-                            if (!this._hold_right) {
-                                this.b_SetDirection(0);
-                            }
-                            this._hold_left = false;
-                            break;
-                        case 'ArrowRight': // Move right.
-                            if (!this._hold_left) {
-                                this.b_SetDirection(0);
-                            }
-                            this._hold_right = false;
-                            break;
+                    if ((evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') && this.b_GameState() === 'GAME') {
+                        switch (evt.key) {
+                            case 'ArrowLeft': // Move left.
+                                if (!this._hold_right) {
+                                    this.b_SetDirection(0);
+                                }
+                                this._hold_left = false;
+                                break;
+                            case 'ArrowRight': // Move right.
+                                if (!this._hold_left) {
+                                    this.b_SetDirection(0);
+                                }
+                                this._hold_right = false;
+                                break;
+                        }
                     }
                 });
             }
 
             Display(position) {
+                //   console.log(this.b_GameState());
                 let x = position.x;
                 let y = position.y;
                 // let last_pos = position.last_pos;
@@ -280,7 +294,7 @@
                 this._view.BindSetDirection(this.SetDirection.bind(this));
                 this._view.BindGetMap(this.GetMap.bind(this));
                 this._view.BindGetGameState(this.GetGameState.bind(this));
-
+                this._view.BindSetGameState(this.SetGameState.bind(this));
             }
 
 
@@ -290,6 +304,10 @@
 
             GetGameState() {
                 return this._model.GetGameState();
+            }
+
+            SetGameState(game_state) {
+                this._model.SetGameState(game_state);
             }
 
             Display(position) {
