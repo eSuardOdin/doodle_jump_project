@@ -6,7 +6,7 @@
     <title>Mouvement</title>
 </head>
 <body>
-    <canvas id="my_canvas" width="400" height="800" style="background: url('./assets/bck.png')" style="border: 1px solid red"></canvas>
+    <canvas id="my_canvas" width="400" height="800" style="margin-right: auto; margin-left: auto; display: block; background: url('./assets/bck.png')" style="border: 1px solid red"></canvas>
 
     <script>
         class Model {
@@ -209,7 +209,6 @@
 
             Events() {
                 document.addEventListener('keydown', (evt) => {
-                    console.log(evt.key);                
                     if ((evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') && this.b_GameState() === 'GAME') {
                         switch (evt.key) {
                             case 'ArrowLeft': // Move left.
@@ -248,27 +247,37 @@
             }
 
             Display(position) {
-                //   console.log(this.b_GameState());
-                let x = position.x;
-                let y = position.y;
-                // let last_pos = position.last_pos;
-                if(this._hold_left) {
-                    position.last_pos = 'l';
-                } else if(this._hold_right) {
-                    position.last_pos = 'r';
+                if(this.b_GameState() === 'GAME') {
+
+                    let x = position.x;
+                    let y = position.y;
+                    // let last_pos = position.last_pos;
+                    if(this._hold_left) {
+                        position.last_pos = 'l';
+                    } else if(this._hold_right) {
+                        position.last_pos = 'r';
+                    }
+                    this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                    this.b_Map().forEach(obj => {
+                        const tile = this.GetTile(obj.type);
+                        this.ctx.drawImage(HEXTILES_IMAGE, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
+                    });
+                    if(position.last_pos === 'l') {
+                        this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                        this.ctx.drawImage(DOODLE_L, this.t_player_l.x, this.t_player_l.y, this.t_player_l.w, this.t_player_l.h, x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                    }
+                    else{
+                        this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
+                        this.ctx.drawImage(DOODLE_R, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
+                    }
                 }
-                this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-                this.b_Map().forEach(obj => {
-                    const tile = this.GetTile(obj.type);
-                    this.ctx.drawImage(HEXTILES_IMAGE, tile.x, tile.y, tile.w, tile.h, obj.x, obj.y, tile.w, tile.h);
-                });
-                if(position.last_pos === 'l') {
-                    this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
-                    this.ctx.drawImage(DOODLE_L, this.t_player_l.x, this.t_player_l.y, this.t_player_l.w, this.t_player_l.h, x, y, this.t_player_l.w/2, this.t_player_l.h/2);
-                }
-                else{
-                    this.ctx.strokeRect(x, y, this.t_player_l.w/2, this.t_player_l.h/2);
-                    this.ctx.drawImage(DOODLE_R, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
+                else if(this.b_GameState() === 'MENU') {
+                    this.ctx.font = 'italic 50px DejaVu Sans Mono';
+                    this.ctx.fillText('Doodle Jump', 8, 250);
+                    this.ctx.font = 'italic 20px DejaVu Sans Mono';
+                    this.ctx.fillText('By TEMU', 15, 280);
+                    this.ctx.font = '20px Arial';
+                    this.ctx.fillText('Press space to get started', 30, 600);
                 }
             }
 
