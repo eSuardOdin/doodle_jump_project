@@ -9,6 +9,12 @@
     <canvas id="my_canvas" width="400" height="800" style="margin-right: auto; margin-left: auto; display: block; background: url('./assets/bck.png')" style="border: 1px solid red"></canvas>
 
     <script>
+
+        /*
+        O------------O
+        |    MODEL   | 
+        O------------O
+        */
         class Model {
             static GRAVITY     = 40;
             static JUMP_FORCE  = 1400;
@@ -16,24 +22,17 @@
             static HEIGHT_TRIG = 300;
             static MAX_GAP = 370;
             constructor() {
-                this._game_state = "MENU"
-                this._score = 0;
-                this._direction = 0;                
-                this._gravitySpeed = 0;
-                this._position = {x: 170, y:493, last_pos: 'r'};
-                this._actual_gap = 40;
-                this._map_objects = [                   
-                    // {type: 'basic_tile', x: 160, y: 400, is_sentinel: true}
-                    {type: 'basic_tile', x: 160, y: 750, is_sentinel: true}
-                ];
-                this._FillMap();
-
+                this.InitGame('MENU');
             }
 
             get position() { return this._position; }
             get direction() { return this._direction; }
             set direction(value) { return this._direction = value; }
             
+            GetScore() {
+                return this._score;
+            }
+
             GetMap() {
                 return this._map_objects;
             }
@@ -45,6 +44,7 @@
             SetGameState(game_state) {
                 this._game_state = game_state;
             }
+
             BindDisplay(callback) {
                 this.b_Display = callback;
             }
@@ -104,8 +104,8 @@
                         }
                     })
                     // ES : Game over condition to handle later
-                    if (this._position.y > 765) { 
-                        this._Jump();
+                    if (this._position.y > 830) { 
+                        this._game_state = 'OVER';
                     }
                 }
 
@@ -117,6 +117,20 @@
                 while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
                     this._FillMap();
                 }
+            }
+
+
+            InitGame(state) {
+                this._game_state = state;
+                this._score = 0;
+                this._direction = 0;                
+                this._gravitySpeed = 0;
+                this._position = {x: 170, y:493, last_pos: 'r'};
+                this._actual_gap = 40;
+                this._map_objects = [                   
+                    {type: 'basic_tile', x: 160, y: 750, is_sentinel: true}
+                ];
+                this._FillMap();
             }
 
             _Jump() {
@@ -137,7 +151,6 @@
                 const platform_y = Math.floor(Math.random() * ((last_sentinel.y - this._actual_gap - 15) - (last_sentinel.y - this._actual_gap + 15)) + (last_sentinel.y - this._actual_gap + 15));
                 
                 let x = Math.random() * 20;
-                //console.log(`x: ${x} vs score: ${this._score / 1000}`);
                 // ES : Check if returning falling/moving or normal platform 
                 if(x < this._score / 500) {
                     if(platform_x % 2 >= 1) {
@@ -148,9 +161,6 @@
                 } else {
                     return {type: "basic_tile", x: platform_x, y: platform_y, is_sentinel: true};
                 }
-                
-                
-                // return new_platform;
             }
 
             _MovePlateform(obj) {
@@ -170,8 +180,11 @@
 
 
 
-
-
+        /*
+        O----------O
+        |   VIEW   | 
+        O----------O
+        */
         class View {
             constructor() {
                 this._canvas = document.getElementById('my_canvas');
@@ -193,6 +206,10 @@
                 return this.tiles.find(t => t.id == id);
             }
 
+            BindGetScore(callback) {
+                this.b_Score = callback;
+            }
+
             BindGetMap(callback) {
                 this.b_Map = callback;
             }
@@ -209,6 +226,10 @@
                 this.b_SetDirection = callback;
             }
 
+            BindInitGame(callback) {
+                this.b_InitGame = callback;
+            }
+
             Events() {
                 document.addEventListener('keydown', (evt) => {
                     if ((evt.key == 'ArrowLeft' || evt.key == 'ArrowRight') && this.b_GameState() === 'GAME') {
@@ -222,9 +243,10 @@
                                 this.b_SetDirection(1);
                                 break;
                         }
-                    } else if(evt.key === ' ' && this.b_GameState() === 'MENU' || this.b_GameState() === 'OVER') {
-                        // console.log('pressed space');
-                        this.b_SetGameState('GAME');
+                    } else if(evt.key === ' ' && (this.b_GameState() === 'MENU' || this.b_GameState() === 'OVER')) {
+                        console.log(`Game state was ${this.b_GameState()}`);
+                        this.b_InitGame('GAME')
+                        console.log(`Game state is ${this.b_GameState()}`);
                     }
                 });
 
@@ -281,6 +303,14 @@
                     this.ctx.font = '20px Arial';
                     this.ctx.fillText('Press space to get started', 30, 600);
                 }
+                else if(this.b_GameState() === 'OVER') {
+                    this.ctx.font = 'italic 50px DejaVu Sans Mono';
+                    this.ctx.fillText('Game Over', 8, 250);
+                    this.ctx.font = 'italic 20px DejaVu Sans Mono';
+                    this.ctx.fillText(`Your score : ${this.b_Score()}` , 15, 280);
+                    this.ctx.font = '20px Arial';
+                    this.ctx.fillText('Press space to get started', 30, 600);
+                }
             }
 
 
@@ -290,7 +320,11 @@
 
 
 
-
+        /*
+        O------------O
+        | CONTROLLER | 
+        O------------O
+        */
         class Controller {
             constructor(model, view) {
                 this._model = model;
@@ -306,9 +340,17 @@
                 this._view.BindGetMap(this.GetMap.bind(this));
                 this._view.BindGetGameState(this.GetGameState.bind(this));
                 this._view.BindSetGameState(this.SetGameState.bind(this));
+                this._view.BindGetScore(this.GetScore.bind(this));
+                this._view.BindInitGame(this.InitGame.bind(this));
             }
 
+            InitGame(state) {
+                this._model.InitGame(state);
+            }
 
+            GetScore() {
+                return this._model.GetScore();
+            }
             GetMap() {
                 return this._model.GetMap();
             }
