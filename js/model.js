@@ -117,8 +117,8 @@ export default class Model {
         this.b_Display(this._position);
         // ES : Get rid of bottom platforms
         this._map_objects = this._map_objects.filter(o => o.y < 800);
-
-        while(Math.min(...this._map_objects.map(o => o.y)) > -400) {
+        console.log(this._map_objects.filter(o => o.type != 'finish_tile'));
+        while(Math.min(...this._map_objects.filter(o => o.type != 'finish_tile').map(o => o.y)) > -400) {
             this._FillMap();
         }
     }
@@ -139,6 +139,7 @@ export default class Model {
             {type: 'basic_tile', x: 160, y: 750, is_sentinel: true}
         ];
         this._FillMap();
+        this._GenerateEnd();
     }
 
     /**
@@ -153,7 +154,7 @@ export default class Model {
      * @todo sentinel concept is deprecated, to refactor.
      */
     _FillMap() {
-            const last_sentinel = this._map_objects.findLast(o => o.is_sentinel === true);
+            const last_sentinel = this._map_objects.filter(o => o.type != 'finish_tile').findLast(o => o.is_sentinel === true);
             let new_sentinel = this._GeneratePlatform(last_sentinel);
             this._map_objects.push(new_sentinel);
     }
@@ -181,6 +182,16 @@ export default class Model {
         } else {
             return {type: "basic_tile", x: platform_x, y: platform_y, is_sentinel: true};
         }
+    }
+
+    /**
+     * Generate the End
+     */
+    _GenerateEnd(){
+        for(let i = 0; i < 7; i++ ){
+            this._map_objects.push({type: "finish_tile", x: i*57, y: -1000, is_sentinel: true});     
+        }         
+        console.log(this._map_objects);    
     }
 
     /**

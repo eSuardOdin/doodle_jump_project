@@ -15,6 +15,7 @@ export default class View {
             {id: 'basic_tile',   x: 1, y: 1, w: 57, h: 15},
             {id: 'moving_tile',  x: 1, y: 19, w: 57, h: 15},
             {id: 'falling_tile', x: 1, y: 55, w: 57, h: 15},
+            {id: 'finish_tile', x: 427, y: 282, w:57, h:15},
         ]
         this.Events();
     }
