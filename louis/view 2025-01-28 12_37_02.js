@@ -111,6 +111,7 @@ export default class View {
 
             let x = position.x;
             let y = position.y;
+
             // let last_pos = position.last_pos;
             if(this._hold_left) {
                 position.last_pos = 'l';
@@ -119,7 +120,7 @@ export default class View {
             }
             // ES : -- GOTCHA -- Clear last screen, if anything to print, put it after.
             this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-            
+
             
             this.b_Map().forEach(obj => {
                 const tile = this.GetTile(obj.type);
@@ -134,24 +135,22 @@ export default class View {
 
             // ES : print score
             this.ctx.font = 'italic 18px DejaVu Sans Mono';
-            this.ctx.fillText(`Score: ${Math.floor(this.b_Score())}`, 5, 15);
+            this.ctx.fillText(`Score: ${this.b_Score()}`, 5, 15);
 
-            // ES : Not working as intended, i is redefined eache time and not incremented.
             // LG : display line
-            console.log(this.b_Nearest());
             this.b_Nearest().forEach(o => {
                 let i = 0
                 if(position.last_pos === 'l'){
                     this.ctx.beginPath(); // Nouveau tracé.
                     this.ctx.moveTo(x, y); // Déplacement du crayon en (100, 0).
                     this.ctx.lineTo(o.x, o.y); // Dessiner la ligne en (150, 100).
-                    this.ctx.strokeStyle = this._color.find(o => o.id == i).color;
+                    this.ctx.strokeStyle = this.color.find(o => o.id == i).color;
                     this.ctx.stroke(); // Afficher la ligne.
                 } else {
                     this.ctx.beginPath(); // Nouveau tracé.
                     this.ctx.moveTo(x, y); // Déplacement du crayon en (100, 0).
                     this.ctx.lineTo(o.x, o.y); // Dessiner la ligne en (150, 100).
-                    this.ctx.strokeStyle = this._color.find(o => o.id == i).color;
+                    this.ctx.strokeStyle = this.color.find(o => o.id == i).color;
                     this.ctx.stroke(); // Afficher la ligne.
                 }
                 i++;
@@ -169,16 +168,7 @@ export default class View {
             this.ctx.font = 'italic 50px DejaVu Sans Mono';
             this.ctx.fillText('Game Over', 8, 250);
             this.ctx.font = 'italic 20px DejaVu Sans Mono';
-            this.ctx.fillText(`Your score : ${Math.floor(this.b_Score())}` , 15, 280);
-            this.ctx.font = '20px Arial';
-            this.ctx.fillText('Press space to get started', 30, 600);
-        }
-
-        else if(this.b_GameState() === 'FINISH') {
-            this.ctx.font = 'italic 35px DejaVu Sans Mono';
-            this.ctx.fillText('You\'ve just beaten the game', 8, 250);
-            this.ctx.font = 'italic 20px DejaVu Sans Mono';
-            this.ctx.fillText(`Your score : ${Math.floor(this.b_Score())}` , 15, 280);
+            this.ctx.fillText(`Your score : ${this.b_Score()}` , 15, 280);
             this.ctx.font = '20px Arial';
             this.ctx.fillText('Press space to get started', 30, 600);
         }

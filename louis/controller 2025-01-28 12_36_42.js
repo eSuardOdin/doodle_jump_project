@@ -33,7 +33,6 @@ export default class Controller {
         return this._model.GetNearest();
     }
 
-
     GetGameState() {
         return this._model.GetGameState();
     }

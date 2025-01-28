@@ -1,6 +1,5 @@
 export default class Model {
     static GRAVITY     = 40;
-    static FINISH      = 20000;
     static JUMP_FORCE  = 1400;
     static SPEED       = 230;
     static HEIGHT_TRIG = 315;   // ES : Height to trigger ascension
@@ -56,12 +55,6 @@ export default class Model {
 
    
     Move(fps) {
-        // ES : Incrementing highest position
-        let score = this._GetScore();
-        // console.log(score);
-        if(score > this._score) {
-            this._score = score;
-        }
         // ES : Incrementing gap between platforms
         if(this._actual_gap < Model.MAX_GAP) {
             this._actual_gap += this._score/50000;
@@ -85,8 +78,8 @@ export default class Model {
                     this._DropPlatform(o);
                 }
             });
-            // this._score = Math.floor(this._score - ((this._gravitySpeed / fps)/2));
-            // this._distance+=1;
+            this._score = Math.floor(this._score - ((this._gravitySpeed / fps)/2));
+            this._distance+=1;
         } else {
             this._position.y += this._gravitySpeed / fps;
             this._map_objects.forEach(o => {
@@ -116,22 +109,19 @@ export default class Model {
                 }
             })
             // ES : If falling
-            if (this._position.y > 830 ) { 
+            if (this._position.y > 830) { 
                 // ES : Comment this for real conditions
                 //this._Jump();
                 
                 // ES : Comment this to debug
                 this._game_state = 'OVER';
             }
-            // if(this._position.y > this._GetFinishY()+500) {
-            //     this._game_state = 'FINISH';
-            // }
         }
 
         this.b_Display(this._position);
         // ES : Get rid of bottom platforms
         this._map_objects = this._map_objects.filter(o => o.y < 800);
-        
+
         // LG : Get four of the nearest tile of the player
         this._map_nearest = this._map_objects;
         this._map_nearest.forEach(o => {
@@ -139,9 +129,9 @@ export default class Model {
         })
         this._map_nearest = this._map_nearest.sort((a, b) => a.distance - b.distance); // Sort the Array by the distance
         this._map_nearest = this._map_nearest.slice(0, 4); // Slice it to only get 4 elements
+        
 
-
-        while(Math.min(...this._map_objects.filter(o => o.type != 'finish_tile').map(o => o.y)) > -400 && this._GetFinishY() >= 0) {
+        while(Math.min(...this._map_objects.filter(o => o.type != 'finish_tile').map(o => o.y)) > -400) {
             this._FillMap();
         }
     }
@@ -154,7 +144,6 @@ export default class Model {
     InitGame(state) {
         this._game_state = state;
         this._score = 0;
-        this._highestPosition = 0;
         this._direction = 0;                
         this._gravitySpeed = 0;
         this._position = {x: 170, y:493, last_pos: 'r'};
@@ -214,21 +203,8 @@ export default class Model {
      */
     _GenerateEnd(){
         for(let i = 0; i < 7; i++ ){
-            this._map_objects.push({type: "finish_tile", x: i*57, y: -Model.FINISH, is_sentinel: true});     
-        }         
-        // console.log(this._map_objects);    
-    }
-
-    _GetFinishY() 
-    {
-        return -Math.min(...this._map_objects.filter(o => o.type == 'finish_tile').map(o => o.y));
-    }
-    _GetScore() {
-        // ES : Get new distance of finish line
-        // const dist = -Math.min(...this._map_objects.filter(o => o.type == 'finish_tile').map(o => o.y));
-        // console.log(dist);
-        // console.log((Model.FINISH - (Model.FINISH + dist))/2);
-        return (Model.FINISH+1 - this._GetFinishY())/2;
+            this._map_objects.push({type: "finish_tile", x: i*57, y: -1000, is_sentinel: true});     
+        }           
     }
 
     /**
