@@ -4,11 +4,11 @@ import Controller from "./controller.js";
 
 
         const HEXTILES_IMAGE = new Image();
-        HEXTILES_IMAGE.src = '../Vmono/assets/game-tiles.png';
+        HEXTILES_IMAGE.src = '../assets/game-tiles.png';
         const DOODLE_R = new Image();
-        DOODLE_R.src = '../Vmono/assets/lik-right.png';
+        DOODLE_R.src = '../assets/lik-right.png';
         const DOODLE_L = new Image();
-        DOODLE_L.src = '../Vmono/assets/lik-left.png';
+        DOODLE_L.src = '../assets/lik-left.png';
         Promise.all([
             new Promise( (resolve) => {HEXTILES_IMAGE.addEventListener('load', () => { resolve();}); })
         ])

@@ -23,6 +23,15 @@ export default class View {
         return this.tiles.find(t => t.id == id);
     }
 
+    ToggleBlur(isBlur) {
+        if(isBlur) {
+            this.ctx.filter = 'blur(5px)';
+        }
+        else {
+            this.ctx.filter = '';
+        }
+    }
+
     BindGetScore(callback) {
         this.b_Score = callback;
     }
@@ -61,9 +70,7 @@ export default class View {
                         break;
                 }
             } else if(evt.key === ' ' && (this.b_GameState() === 'MENU' || this.b_GameState() === 'OVER')) {
-                console.log(`Game state was ${this.b_GameState()}`);
                 this.b_InitGame('GAME')
-                console.log(`Game state is ${this.b_GameState()}`);
             }
         });
 
@@ -113,7 +120,7 @@ export default class View {
             else{
                 this.ctx.drawImage(this._r_img, this.t_player_r.x, this.t_player_r.y, this.t_player_r.w, this.t_player_r.h, x, y, this.t_player_r.w/2, this.t_player_r.h/2);
             }
-            
+
             // ES : print score
             this.ctx.font = 'italic 18px DejaVu Sans Mono';
             this.ctx.fillText(`Score: ${this.b_Score()}`, 5, 15);

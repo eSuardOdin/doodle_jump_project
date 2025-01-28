@@ -1,8 +1,8 @@
 export default class Model {
     static GRAVITY     = 40;
     static JUMP_FORCE  = 1400;
-    static SPEED       = 200;
-    static HEIGHT_TRIG = 315;   // ES : Height to trigger ascension 
+    static SPEED       = 230;
+    static HEIGHT_TRIG = 315;   // ES : Height to trigger ascension
     static MAX_GAP = 370;       // ES : Max distance between platforms 
     constructor() {
         this.InitGame('MENU');
@@ -48,6 +48,7 @@ export default class Model {
         this.b_Display = callback;
     }
 
+
    
     Move(fps) {
         // ES : Incrementing gap between platforms
@@ -74,6 +75,7 @@ export default class Model {
                 }
             });
             this._score = Math.floor(this._score - ((this._gravitySpeed / fps)/2));
+            this._distance+=1;
         } else {
             this._position.y += this._gravitySpeed / fps;
             this._map_objects.forEach(o => {
