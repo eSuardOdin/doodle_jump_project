@@ -109,7 +109,7 @@ export default class View {
             }
             // ES : -- GOTCHA -- Clear last screen, if anything to print, put it after.
             this.ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-
+            
             
             this.b_Map().forEach(obj => {
                 const tile = this.GetTile(obj.type);
@@ -124,7 +124,7 @@ export default class View {
 
             // ES : print score
             this.ctx.font = 'italic 18px DejaVu Sans Mono';
-            this.ctx.fillText(`Score: ${this.b_Score()}`, 5, 15);
+            this.ctx.fillText(`Score: ${Math.floor(this.b_Score())}`, 5, 15);
         }
         else if(this.b_GameState() === 'MENU') {
             this.ctx.font = 'italic 50px DejaVu Sans Mono';
