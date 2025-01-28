@@ -18,10 +18,10 @@ export default class View {
             {id: 'finish_tile', x: 427, y: 282, w:57, h:15},
         ]
         this._color = [
-            {id: 0, color:'blue'},
-            {id: 1, color:'red'},
-            {id: 2, color:'green'},
-            {id: 3, color:'yellow'},
+            {id: 0, color:'#3a41cf'}, //Blue
+            {id: 1, color:'#c9383d'}, //Red
+            {id: 2, color:'#74de37'}, //Green
+            {id: 3, color:'#bfc234'}, //Yellow
         ]
         this.Events();
     }
@@ -138,16 +138,17 @@ export default class View {
 
             // ES : Not working as intended, i is redefined eache time and not incremented.
             // LG : display line
-            console.log(this.b_Nearest());
+            let i = 0
             this.b_Nearest().forEach(o => {
-                let i = 0
                 if(position.last_pos === 'l'){
+                    this.ctx.lineWidth = 3;
                     this.ctx.beginPath(); // Nouveau tracé.
                     this.ctx.moveTo(x, y); // Déplacement du crayon en (100, 0).
                     this.ctx.lineTo(o.x, o.y); // Dessiner la ligne en (150, 100).
                     this.ctx.strokeStyle = this._color.find(o => o.id == i).color;
                     this.ctx.stroke(); // Afficher la ligne.
                 } else {
+                    this.ctx.lineWidth = 3;
                     this.ctx.beginPath(); // Nouveau tracé.
                     this.ctx.moveTo(x, y); // Déplacement du crayon en (100, 0).
                     this.ctx.lineTo(o.x, o.y); // Dessiner la ligne en (150, 100).
